@@ -42,13 +42,13 @@
                 "</div>";
             var html = "";
 
-            getComments();
+            buildComments();
 
-            function getComments() {
+            function buildComments() {
                 html = '<button class="btn btn-sm btn-success" id="answer_0">Add comment</button>\n' +
                     '    <div class=\'textarea_block\' id=\'edit_block_0\' style=\'display: none\'>\n' +
                     '        <textarea class=\'form-control\' id=\'0\'></textarea>\n' +
-                    '        <button class=\'btn btn-sm btn-success save-btn\' id=\'btn_add_0\' >Add</button>\n' +
+                    '        <button class=\'btn btn-sm btn-success add-btn\' id=\'btn_add_0\' >Add</button>\n' +
                     '    </div>';
                 $('textarea[id=0]').val('');
                 $.ajax({
@@ -127,12 +127,27 @@
                 $('button[id^=remove_]').click(function () {
                     if (confirm('Are you sure?')) {
                         var id = getCommentId(this.id);
-                        $('div[data-comment-id=' + id + ']').parent().remove();
+
+                        $.ajax({
+                            url: '/comment/remove/'+id,
+                            type: 'post',
+                            //data: {'id': id},
+
+                            success: function (answer) {
+                                //alert(answer);
+                                if (answer == 'true') {
+                                    buildComments();
+                                } else {
+                                    alert(answer);
+                                }
+                            }
+                        });
+                        //$('div[data-comment-id=' + id + ']').parent().remove();
                     }
 
                 });
 
-                //API event
+                //add or edit events
 
                 $('button[id^=btn_add_]').click(function () {
                     var id = $(this).attr('id').split('_')[2];
@@ -152,7 +167,34 @@
                                 if (answer == 'true') {
                                     $('textarea[id=' + id + ']').val('');
                                     $('div[id=edit_block_'+id+']').hide();
-                                    getComments();
+                                    buildComments();
+                                } else {
+                                    alert(answer);
+                                }
+                            }
+                        });
+                    }
+                });
+
+                $('button[id^=btn_edit_]').click(function () {
+                    var id = $(this).attr('id').split('_')[2];
+                    //var parent_id = $(this).attr('data-parent');
+                    var text = $('textarea[id=' + id + ']').val();
+                    if (text.length == 0) {
+                        alert('Enter text');
+                        $('textarea[id=' + id + ']').focus();
+                    } else {
+                        $.ajax({
+                            url: '/comment/edit',
+                            type: 'post',
+                            data: {'id': id, 'comment': text },
+
+                            success: function (answer) {
+                                //alert(answer);
+                                if (answer == 'true') {
+                                    $('textarea[id=' + id + ']').val('');
+                                    $('div[id=edit_block_'+id+']').hide();
+                                    buildComments();
                                 } else {
                                     alert(answer);
                                 }

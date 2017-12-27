@@ -47,7 +47,7 @@ class CommentController extends Controller
         //$request->get('comment')
         $parent_id = $request->get('parent_id');
         $comment = $request->get('comment');
-
+        // TODO: validate parameters and clear before
         try {
             DB::table('comments')->insert(
                 ['parent_id' => $parent_id, 'comment' => $comment]
@@ -58,7 +58,36 @@ class CommentController extends Controller
         }
 
         //return response()->json($request->get('parent_id'));
+    }
 
+    public function editComment(Request $request)
+    {
+        $id = $request->get('id');
+        $comment = $request->get('comment');
+        // TODO: validate parameters and clear before
+        try {
+            DB::table('comments')
+                ->where('id', $id)
+                ->update(['comment' => $comment]);
+
+            return response()->json('true');
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage());
+        }
+
+        //return response()->json($request->get('parent_id'));
+    }
+
+    public function removeComment($id)
+    {
+        // TODO: remove childrens
+        try {
+            DB::table('comments')->where('id', '=', intval($id))->delete();
+            return response()->json('true');
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage());
+        }
+        //return response()->json($comment);
     }
 
     public function create()
