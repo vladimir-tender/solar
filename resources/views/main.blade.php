@@ -95,10 +95,11 @@
                     $('.textarea_block').hide();
                     $('.edit-btn').hide();
                     $('.add-btn').hide();
-                    $('textarea[id=' + id + ']').val('');
 
                     $('div[id=edit_block_' + id + ']').show();
                     $('button[id=btn_add_' + id + ']').show();
+
+                    $('textarea[id=' + id + ']').val('').focus();
 
 
                 });
@@ -122,6 +123,7 @@
 
                     $('div[id=edit_block_' + id + ']').show();
                     $('button[id=btn_edit_' + id + ']').show();
+                    $('textarea[id=' + id + ']').focus();
                 });
 
                 $('button[id^=remove_]').click(function () {
