@@ -41,6 +41,26 @@ class CommentController extends Controller
         return response()->json($comment);
     }
 
+    public function addComment(Request $request)
+    {
+        //dd($request->get('comment'));
+        //$request->get('comment')
+        $parent_id = $request->get('parent_id');
+        $comment = $request->get('comment');
+
+        try {
+            DB::table('comments')->insert(
+                ['parent_id' => $parent_id, 'comment' => $comment]
+            );
+            return response()->json('true');
+        } catch (\Exception $exception) {
+            return response()->json($exception->getMessage());
+        }
+
+        //return response()->json($request->get('parent_id'));
+
+    }
+
     public function create()
     {
         return view("comment.create");

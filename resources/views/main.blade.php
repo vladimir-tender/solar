@@ -11,10 +11,7 @@
         </div>
     @endforeach--}}
     <h2>Comment tree. Data via api</h2>
-    <button class="btn btn-sm btn-success" id="answer_0">Add comment</button>
-    <div class='textarea_block' id='edit_block_0' style='display: none'>
-        <textarea class='form-control' id='0'></textarea><button class='btn btn-sm btn-success'>Save</button>
-    </div>
+
 
 
     <div class="comments-container">
@@ -27,26 +24,40 @@
 @section('bottom_javascripts')
     <script>
         $(function () {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
             var prototype = "<div data-comment-id='__id__' data-parent='__parent_id__'><div id='comment_body___id__'>__comment__</div></div>" +
                 "<div>" +
                 "<button class='btn btn-xs btn-success' id='answer___id__'>answer</button>" +
                 "<button class='btn btn-xs btn-primary' id='edit___id__'>edit</button>" +
                 "<button class='btn btn-xs btn-danger' id='remove___id__'>remove</button></div>" +
                 "<div class='textarea_block' id='edit_block___id__' style='display: none'>" +
-                "<textarea class='form-control' id='__id__'></textarea><button class='btn btn-sm btn-success'>Save</button>" +
+                "<textarea class='form-control' id='__id__'></textarea>" +
+                "<button class='btn btn-sm btn-primary edit-btn' style='display: none' id='btn_edit___id__'>Edit</button>" +
+                "<button class='btn btn-sm btn-success add-btn' style='display: none' id='btn_add___id__' data-parent='__parent_id__'>Add</button>" +
                 "</div>";
             var html = "";
 
             getComments();
 
             function getComments() {
+                html = '<button class="btn btn-sm btn-success" id="answer_0">Add comment</button>\n' +
+                    '    <div class=\'textarea_block\' id=\'edit_block_0\' style=\'display: none\'>\n' +
+                    '        <textarea class=\'form-control\' id=\'0\'></textarea>\n' +
+                    '        <button class=\'btn btn-sm btn-success save-btn\' id=\'btn_add_0\' >Add</button>\n' +
+                    '    </div>';
+                $('textarea[id=0]').val('');
                 $.ajax({
                     type: "GET",
                     url: '/comments/ajax',
                     success: function (json) {
                         //console.log(json);
                         html = buildTree(json);
-                        $('.comments-container').html(html);
+                        $('.comments-container').empty().html(html);
                         userEvents();
                     }
                 })
@@ -82,7 +93,14 @@
                     var id = getCommentId(this.id);
 
                     $('.textarea_block').hide();
-                    $('div[id=edit_block_'+id+']').show();
+                    $('.edit-btn').hide();
+                    $('.add-btn').hide();
+                    $('textarea[id=' + id + ']').val('');
+
+                    $('div[id=edit_block_' + id + ']').show();
+                    $('button[id=btn_add_' + id + ']').show();
+
+
                 });
 
                 $('button[id^=edit_]').click(function () {
@@ -90,24 +108,57 @@
 
                     $.ajax({
                         type: "GET",
-                        url: '/get/comment/'+id,
+                        url: '/get/comment/' + id,
                         success: function (comment) {
                             //console.log(json);
-                            $('textarea[id='+id+']').val(comment.comment);
+                            $('textarea[id=' + id + ']').val(comment.comment);
                         }
                     });
 
 
                     $('.textarea_block').hide();
-                    $('div[id=edit_block_'+id+']').show();
+                    $('.edit-btn').hide();
+                    $('.add-btn').hide();
+
+                    $('div[id=edit_block_' + id + ']').show();
+                    $('button[id=btn_edit_' + id + ']').show();
                 });
 
                 $('button[id^=remove_]').click(function () {
                     if (confirm('Are you sure?')) {
                         var id = getCommentId(this.id);
-                        $('div[data-comment-id='+id+']').parent().remove();
+                        $('div[data-comment-id=' + id + ']').parent().remove();
                     }
 
+                });
+
+                //API event
+
+                $('button[id^=btn_add_]').click(function () {
+                    var id = $(this).attr('id').split('_')[2];
+                    //var parent_id = $(this).attr('data-parent');
+                    var text = $('textarea[id=' + id + ']').val();
+                    if (text.length == 0) {
+                        alert('Enter text');
+                        $('textarea[id=' + id + ']').focus();
+                    } else {
+                        $.ajax({
+                            url: '/comment/add',
+                            type: 'post',
+                            data: {'parent_id': id, 'comment': text },
+
+                            success: function (answer) {
+                                //alert(answer);
+                                if (answer == 'true') {
+                                    $('textarea[id=' + id + ']').val('');
+                                    $('div[id=edit_block_'+id+']').hide();
+                                    getComments();
+                                } else {
+                                    alert(answer);
+                                }
+                            }
+                        });
+                    }
                 });
             }
 
