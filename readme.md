@@ -17,6 +17,11 @@
 $ git clone https://github.com/vladimir-tender/solar
 $ cd solar
 ```
+Установите зависимости
+```sh
+$ composer install
+```
+
 Создайте базу данных
 ```sh
 $ mysql -uroot -p
