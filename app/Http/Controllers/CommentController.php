@@ -36,7 +36,7 @@ class CommentController extends Controller
 
         try {
             DB::table('comments')->insert(
-                ['parent_id' => $parent_id, 'comment' => $comment]
+                ['parent_id' => intval($parent_id), 'comment' => $comment]
             );
             return response()->json('true');
         } catch (\Exception $exception) {
@@ -70,10 +70,9 @@ class CommentController extends Controller
         } catch (\Exception $exception) {
             return response()->json($exception->getMessage());
         }
-        //return response()->json($comment);
     }
 
-    public function getTreeArray($comments, $parent_id) {
+    private function getTreeArray($comments, $parent_id) {
         $array = [];
         foreach ($comments as $comment) {
             if ($comment['parent_id'] == $parent_id) {
@@ -84,25 +83,5 @@ class CommentController extends Controller
         }
         return $array ? $array : '';
     }
-
-    /*public function create()
-    {
-        return view("comment.create");
-    }
-
-
-    public function arraySet()
-    {
-        $this->comments = [
-            ['id' => '1', 'parent_id' => null, 'comment' => 'Comment 1'],
-            ['id' => '2', 'parent_id' => '1', 'comment' => 'Comment 2'],
-            ['id' => '3', 'parent_id' => null, 'comment' => 'Comment 3'],
-            ['id' => '4', 'parent_id' => '1', 'comment' => 'Comment 4'],
-            ['id' => '5', 'parent_id' => '2', 'comment' => 'Comment 5'],
-            ['id' => '6', 'parent_id' => '2', 'comment' => 'Comment 6'],
-            ['id' => '7', 'parent_id' => '1', 'comment' => 'Comment 7']
-        ];
-    }*/
-
 
 }

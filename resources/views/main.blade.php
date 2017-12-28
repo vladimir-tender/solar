@@ -2,18 +2,9 @@
 
 
 @section('content')
-
-    {{--@foreach($comments as $comment)
-        <div class="col-md-6">
-            {{ $comment['comment'] }}<br>
-            --}}{{--<a href="/comment/{{$comment['id']}}">Link</a>--}}{{--
-            --}}{{--<a href="{{ route('comment', ['id' => $comment->id]) }}"></a>--}}{{--
-        </div>
-    @endforeach--}}
     <h2>Comment tree</h2>
 
     <div class="comments-container">
-
     </div>
 @endsection
 
@@ -53,7 +44,6 @@
                     type: "GET",
                     url: '/comments/ajax',
                     success: function (json) {
-                        //console.log(json);
                         html = buildTree(json);
                         $('.comments-container').empty().html(html);
                         userEvents();
@@ -63,8 +53,7 @@
 
             function buildTree(array) {
                 html += "<ul class='list-group'>";
-                array.forEach(function (comment, index) {
-                    //console.log(comment);
+                array.forEach(function (comment) {
                     html += "<li class='list-group-item'>";
                     html += createComment(comment);
                     html += "</li>";
@@ -110,7 +99,6 @@
                         type: "GET",
                         url: '/get/comment/' + id,
                         success: function (comment) {
-                            //console.log(json);
                             $('textarea[id=' + id + ']').val(comment.comment);
                         }
                     });
@@ -132,8 +120,6 @@
                         $.ajax({
                             url: '/comment/remove/'+id,
                             type: 'post',
-                            //data: {'id': id},
-
                             success: function (answer) {
                                 //alert(answer);
                                 if (answer == 'true') {
@@ -143,16 +129,13 @@
                                 }
                             }
                         });
-                        //$('div[data-comment-id=' + id + ']').parent().remove();
                     }
-
                 });
 
                 //add or edit events
 
                 $('button[id^=btn_add_]').click(function () {
                     var id = $(this).attr('id').split('_')[2];
-                    //var parent_id = $(this).attr('data-parent');
                     var text = $('textarea[id=' + id + ']').val();
                     if (text.length == 0) {
                         alert('Enter text');
@@ -179,7 +162,6 @@
 
                 $('button[id^=btn_edit_]').click(function () {
                     var id = $(this).attr('id').split('_')[2];
-                    //var parent_id = $(this).attr('data-parent');
                     var text = $('textarea[id=' + id + ']').val();
                     if (text.length == 0) {
                         alert('Enter text');
@@ -191,7 +173,6 @@
                             data: {'id': id, 'comment': text },
 
                             success: function (answer) {
-                                //alert(answer);
                                 if (answer == 'true') {
                                     $('textarea[id=' + id + ']').val('');
                                     $('div[id=edit_block_'+id+']').hide();
