@@ -20,7 +20,8 @@ $ cd solar
 Создайте базу данных
 ```sh
 $ mysql -uroot -p
-$ create database solar
+mysql> create database solar
+mysql> exit
 ```
 
 Создайте файл конфигурации .env, в котором укажите подключение к БД (DB_HOST, DB_PORT, DB_DATABASE, DA_USERNAME, DB_PASSWORD)

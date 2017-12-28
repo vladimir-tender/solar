@@ -10,9 +10,7 @@
             --}}{{--<a href="{{ route('comment', ['id' => $comment->id]) }}"></a>--}}{{--
         </div>
     @endforeach--}}
-    <h2>Comment tree. Data via api</h2>
-
-
+    <h2>Comment tree</h2>
 
     <div class="comments-container">
 
@@ -82,9 +80,10 @@
 
             function createComment(comment) {
                 var new_comment = prototype;
+                var text = comment.comment.replace(/(?:\r\n|\r|\n)/g, '<br />');
                 new_comment = new_comment.replace(/__id__/g, comment.id);
                 new_comment = new_comment.replace(/__parent_id__/g, comment.parent_id);
-                new_comment = new_comment.replace(/__comment__/g, comment.comment);
+                new_comment = new_comment.replace(/__comment__/g, text);
                 return new_comment;
             }
 
